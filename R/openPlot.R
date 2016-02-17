@@ -5,6 +5,6 @@ function(size = 15) {
     }
     
     par(new = FALSE, xpd = TRUE, mai = c(0.05, 0.05, 0.05, 0.05))
-    plot(0:1000, type = "n", axes = FALSE)
+    plot(0:1000, type = "n", axes = FALSE, asp = 1)
 }
 

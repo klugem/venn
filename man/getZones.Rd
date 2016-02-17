@@ -10,12 +10,13 @@ zone or a list of zones.
 }
 
 \usage{
-getZones(ints, nofsets)
+getZones(ints, nofsets, ellipse = FALSE)
 }
 
 \arguments{
   \item{ints}{A vector of decimal numbers specific to a list of set intersection.}
   \item{nofsets}{The number of sets.}
+  \item{ellipse}{Logical, get the zones from the shape of an ellipse, where possible}
 }
 
 \details{
@@ -35,6 +36,9 @@ The decimal representation for these intersections is calculated as:\cr
 \code{101 = 2^2 + 2^0 = 5}\cr
 \code{110 = 2^2 + 2^1 = 6}\cr
 \code{111 = 2^2 + 2^1 + 2^0 = 7}\cr
+
+The argument \code{ellipse} retrieves the data from the shape of an ellipse, and it only
+works with 4 and 5 sets.
 
 }
 

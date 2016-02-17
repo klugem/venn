@@ -5,8 +5,10 @@ function(data) {
             x <- x[-nrow(x), ]
         }
         
-        vals <- seq(1, nrow(x), by = floor(nrow(x)/10))
-        x <- x[c(vals, nrow(x)), ]
+        if (nrow(x) > 10) {
+            vals <- seq(1, nrow(x), by = floor(nrow(x)/10))
+            x <- x[c(vals, nrow(x)), ]
+        }
         
         asum <- cxsum <- cysum <- 0
         

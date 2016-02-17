@@ -17,8 +17,8 @@ Draws and displays Venn diagrams up to 7 sets, and any boolean union of set inte
     \tabular{ll}{
     Package: \tab venn\cr
     Type:    \tab Package\cr
-    Version: \tab 1.0\cr
-    Date:    \tab 2016-01-08\cr
+    Version: \tab 1.1\cr
+    Date:    \tab 2016-02-16\cr
     License: \tab GPL (>= 2)\cr
     }
 }

@@ -3,9 +3,12 @@ export(.onAttach,
        getCentroid,
        getZones,
        openPlot,
-       venn,
-       plotRules)
+       translate2,
+       plotRules,
+       venn)
 importFrom("grDevices", "adjustcolor", "dev.cur", "dev.new")
 importFrom("graphics", "lines", "par", "plot", "polygon",
            "polypath", "text")
 importFrom("utils", "packageDescription", "read.csv")
+importFrom("grDevices", "colorRampPalette")
+importFrom("grDevices", "col2rgb", "rgb")
