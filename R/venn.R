@@ -7,6 +7,12 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
         stop("Argument \"x\" is missing.\n\n", call. = FALSE)
     }
     
+    funargs <- unlist(lapply(match.call(), deparse)[-1])
+    
+    if (inherits(tryCatch(eval(x), error = function(e) e), "error")) {
+        x <- funargs["x"]
+    }
+    
     if (is.numeric(x)) {
         if (length(x) > 1) {
             cat("\n")
@@ -187,6 +193,7 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
             }), collapse = "+")
         }
         
+        
         # then check again
         if (!all(gsub("0|1|-|\\+", "", x) == "")) {
             cat("\n")
@@ -262,7 +269,7 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
     
     if (nofsets > 7) {
         cat("\n")
-        stop("Venn diagrams can be drawn up to 7 sets only.\n\n", call. = FALSE)
+        stop("Venn diagrams can be drawn up to 7 sets.\n\n", call. = FALSE)
     }
     
     if (identical(snames, "")) {
@@ -286,8 +293,8 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
     scoords <- data.frame(
         s = c(1, rep(2, 2), rep(3, 3), rep(4, 4), rep(5, 10), rep(6, 6), rep(7, 7), rep(4, 4)),
         v = c(rep(0, 1 + 2 + 3), rep(1, 4), rep(0:1, each = 5), rep(0, 6 + 7), rep(0, 4)), 
-        x = c(500, 250, 750, 100, 500, 900,  88, 263, 713, 888,     85, 535, 900, 700, 120,      88, 533, 850, 750, 163,       100, 500, 910, 925, 550, 100, 220, 685, 935, 935, 600, 155,  50,  85, 220, 780, 915),
-        y = c(780, 780, 780, 560, 910, 560, 663, 850, 850, 663,    770, 960, 700,  50, 120,     750, 963, 688,  40,  88,       860, 975, 775, 165,  30, 140, 955, 980, 780, 200,  15, 120, 690, 670, 850, 850, 670)
+        x = c(500, 250, 750, 100, 500, 900,  88, 263, 713, 888,     80, 535, 900, 700, 120,      88, 533, 850, 750, 163,       100, 500, 910, 925, 550, 100, 220, 685, 935, 935, 600, 155,  50,  85, 220, 780, 915),
+        y = c(780, 780, 780, 560, 910, 560, 663, 850, 850, 663,    800, 960, 700,  50, 120,     750, 963, 688,  40,  88,       860, 975, 775, 165,  30, 140, 955, 980, 780, 200,  15, 120, 690, 670, 850, 850, 670)
     )
     
     if (ilabels | counts) {
@@ -303,14 +310,23 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
         
     text(scoords[scoords$s == nofsets & scoords$v == as.numeric(ellipse), c("x", "y")], labels = snames, cex = cexsn)
     
-    ### TODO: replace with legend()
-    
     if (ttqca) {
-        for (i in 0:3) {
-            polygon(110*i + c(0, 19, 19, 0), c(0, 0, 19, 19) - 35, col = ttcolors[i + 1])
-            text(110*i + 40, 9 - 35, names(ttcolors)[i + 1], cex = 0.85)
-        }
+        # TRY 1: slow
+        # for (i in 0:3) {
+        #     polygon(110*i + c(0, 19, 19, 0), c(0, 0, 19, 19) - 35, col = ttcolors[i + 1])
+        #     text(110*i + 40, 9 - 35, names(ttcolors)[i + 1], cex = 0.85)
+        # }
+        
+        # TRY 2: rectangles not square
+        # legend(-22, 3, horiz = TRUE, legend = c("0", "1", "C", "?"),
+        #        bty = "n", fill = ttcolors, text.width = 60, cex = 0.9, x.intersp = 0.6)
+        
+        # TRY 3: perfect
+        points(seq(10, 340, length.out = 4), rep(-25, 4), pch = 22, bg = ttcolors, cex = 1.75)
+        text(seq(40, 370, length.out = 4), rep(-26, 4), names(ttcolors), cex = 0.85)
     }
+    
+        
     
 }
 

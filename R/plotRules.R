@@ -51,16 +51,13 @@ function(rules, zcolor = "bw", ellipse = FALSE, transparency = 0.3, ...) {
         # check if any of the remaining rowns define a whole set
             
         # wholesets will be a numeric vector:
-        # -1 if it's not a whole set
+        # 0 if it's not a whole set
         # the number of the set (if it is whole), from the order in the truth table
         
-        wholesets <- unlist(lapply(rowns, function(x) {
-            x <- which(apply(tt, 2, function(y) {
-                identical(x, as.numeric(rownames(tt)[y == 1]))
-            }))
-            
-            return(ifelse(length(x) > 0, x, -1))
+        wholesets <- unlist(lapply(rules, function(x) {
+            ifelse(nchar(gsub("-", "", x)) == 1, as.vector(regexpr("[0-9]", x)), 0)
         }))
+        
         
         allwhole <- all(wholesets > 0)
         
@@ -74,35 +71,38 @@ function(rules, zcolor = "bw", ellipse = FALSE, transparency = 0.3, ...) {
         
         zones <- vector("list", length(wholesets))
         
-        regular <- !unlist(lapply(rowns, identical, 0))
+        iregular <- unlist(lapply(rowns, function(x) any(x == 0)))
         
-        if (any(!regular)) { # inverse, the area outside all sets
-            zones[[which(!regular)]] <- getZones(0, nofsets, ellipse)
-            polygons <- rbind(zeroset, rep(NA, 2), zones[[which(!regular)]][[1]])
-            polygons <- polygons[-nrow(polygons), ] # needed...?
-            polypath(polygons, rule = "evenodd", col = adjustcolor(zcolor[!regular], alpha.f = transparency), border = NA)
+        
+        if (any(iregular)) { # inverse, the area outside a shape (or outside all shapes)
+            
+            for (i in which(iregular)) {
+                zones[[i]] <- getZones(rowns[[i]], nofsets, ellipse)
+                polygons <- rbind(zeroset, rep(NA, 2), zones[[i]][[1]])
+                polygons <- polygons[-nrow(polygons), ] # needed...?
+                polypath(polygons, rule = "evenodd", col = adjustcolor(zcolor[i], alpha.f = transparency), border = NA)
+            }
         }
         
         
-        if (any(regular)) {
+        if (any(!iregular)) { # normal shapes
             
             if (any(wholesets > 0)) {
-                
                 for (i in which(wholesets > 0)) {
                     # [[1]] simulez getZones() pentru ca uneori pot fi mai multe zone
                     zones[[i]][[1]] <- sets[sets$s == nofsets & sets$v == as.numeric(ellipse) & sets$n == wholesets[i], c("x", "y")]
                 }
             }
             
-            if (any(wholesets < 0)) {
-                for (i in which(wholesets < 0)) {
+            if (any(wholesets == 0)) {
+                for (i in which(wholesets == 0 & !iregular)) {
                     zones[[i]] <- getZones(rowns[[i]], nofsets, ellipse)
                 }
             }
             
             
             for (i in seq(length(zones))) {
-                if (regular[i]) {
+                if (!iregular[i]) {
                     for (j in seq(length(zones[[i]]))) {
                         polygon(zones[[i]][[j]], col = adjustcolor(zcolor[i], alpha.f = transparency), border = NA)
                     }

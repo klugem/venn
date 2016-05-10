@@ -21,23 +21,23 @@ getZones(ints, nofsets, ellipse = FALSE)
 
 \details{
          
-A "zone" is a union of set intersections. There are exactly \code{2^k} intersections
-in a Venn diagram, where \code{k} is the number of sets. To highlight an entire set,
+A "zone" is a union of set intersections. There are exactly \bold{\code{2^k}} intersections
+in a Venn diagram, where \bold{\code{k}} is the number of sets. To highlight an entire set,
 we need a union of all possible intersections which form that set.
 
 In a 3 sets diagram, the (overall) first set is composed by four intersections:\cr
-\code{100} for what is in the first set but outside sets 2 and outside set 3\cr
-\code{101} for the intersection between sets 1 and 3, outside set 2\cr
-\code{110} for the intersection between sets 1 and 2, outside set 3\cr
-\code{111} for the intersection between all three sets.
+\bold{\code{100}} for what is in the first set but outside sets 2 and outside set 3\cr
+\bold{\code{101}} for the intersection between sets 1 and 3, outside set 2\cr
+\bold{\code{110}} for the intersection between sets 1 and 2, outside set 3\cr
+\bold{\code{111}} for the intersection between all three sets.
 
 The decimal representation for these intersections is calculated as:\cr
-\code{100 = 2^2 = 4}\cr
-\code{101 = 2^2 + 2^0 = 5}\cr
-\code{110 = 2^2 + 2^1 = 6}\cr
-\code{111 = 2^2 + 2^1 + 2^0 = 7}\cr
+\bold{\code{100 = 2^2 = 4}}\cr
+\bold{\code{101 = 2^2 + 2^0 = 5}}\cr
+\bold{\code{110 = 2^2 + 2^1 = 6}}\cr
+\bold{\code{111 = 2^2 + 2^1 + 2^0 = 7}}\cr
 
-The argument \code{ellipse} retrieves the data from the shape of an ellipse, and it only
+The argument \bold{\code{ellipse}} retrieves the data from the shape of an ellipse, and it only
 works with 4 and 5 sets.
 
 }
