@@ -1,5 +1,7 @@
 `getZones` <-
-function(ints, nofsets, ellipse = FALSE) {
+function(area, snames, ellipse = FALSE) {
+    
+    funargs <- unlist(lapply(match.call(), deparse)[-1])
     
     # s - sets; v - version; b - borders; x,y - coordinates
     borders <- read.csv(file.path(system.file("data", package="venn"), "borders.csv.gz"))
@@ -7,28 +9,107 @@ function(ints, nofsets, ellipse = FALSE) {
     # s - sets; v - version; i - intersection; b - border
     ib <- read.csv(file.path(system.file("data", package="venn"), "ib.csv.gz"))
     
-    ints <- ints + 1
+    if (is.character(area)) {
+        x <- gsub("[[:space:]]", "", area)
+        
+        
+        if (!all(gsub("0|1|-", "", x) == "")) {
+            
+            if (any(grepl("\\$solution", funargs["area"]))) {
+                obj <- get(unlist(strsplit(funargs["area"], split = "[$]"))[1])
+                snames <- obj$tt$options$conditions
+                x <- paste(x, collapse = " + ")
+            }
+            
+            x <- gsub("[[:space:]]", "", x)
+            
+            if (!all(gsub("0|1|-|\\+", "", x) == "")) {
+                
+                x <- translate2(x, snames)
+                
+                snames <- colnames(x)
+                
+                x <- paste(apply(x, 1, function(y) {
+                    y[y < 0] <- "-"
+                    paste(y, collapse="")
+                }), collapse = "+")
+            }
+            
+            
+            # then check again
+            if (!all(gsub("0|1|-|\\+", "", x) == "")) {
+                cat("\n")
+                stop("Invalid specification of the area.\n\n", call. = FALSE)
+            }
+            
+            area <- unlist(strsplit(x, split="\\+"))
+            
+        }
+        
+        nofsets <- unique(nchar(area))
+        
+        if (length(nofsets) > 1) {
+            cat("\n")
+            stop("Different numbers of sets in the area.\n\n", call. = FALSE)
+        }
+        
+        if (!identical(unique(gsub("1|0|-", "", area)), "")) {
+            cat("\n")
+            stop("The arguent \"area\" should only contain \"1\"s, \"0\"s and dashes \"-\".\n\n", call. = FALSE)
+        }
+        
+        area <- sort(unique(unlist(lapply(strsplit(area, split = ""), function(x) {
+            dashes <- x == "-"
+            
+            if (any(dashes)) {
+                sumdash <- sum(dashes)
+                tt <- sapply(rev(seq(sumdash)), function(x) {
+                        rep.int(c(sapply(0:1, function(y) rep.int(y, 2^(x - 1)))), 2^sumdash/2^x)})
+                
+                for (i in as.numeric(x[!dashes])) {
+                    tt <- cbind(tt, i)
+                }
+                
+                mbase <- rev(c(1, cumprod(rev(rep(2, ncol(tt))))))[-1]
+                tt <- tt[, match(seq(ncol(tt)), c(which(dashes), which(!dashes)))]
+                return(as.vector(tt %*% mbase))
+                
+            }
+            else {
+                x <- as.numeric(x)
+                mbase <- rev(c(1, cumprod(rev(rep(2, length(x))))))[-1]
+                return(sum(x * mbase))
+            }
+        }))))
+    }
+    else {
+        nofsets <- snames
+    }
+    
+    area <- area + 1
+    
     
     if (nofsets < 4 | nofsets > 5) {
         ellipse <- FALSE
     }
     
-    if (identical(ints, 1)) {
-        ints <- seq(2^nofsets)[-1]
+    if (identical(area, 1)) {
+        area <- seq(2^nofsets)[-1]
     }
     
-    if (length(ints) > 1) {
-        checkz <- logical(length(ints))
-        names(checkz) <- ints
+    if (length(area) > 1) {
+        
+        checkz <- logical(length(area))
+        names(checkz) <- area
         checkz[1] <- TRUE
         
         result <- list()
         
         while(!all(checkz)) {
-            checkz <- checkZone(as.numeric(names(checkz)[1]), ints, checkz, nofsets, ib, ellipse)
+            checkz <- checkZone(as.numeric(names(checkz)[1]), area, checkz, nofsets, ib, ellipse)
             
             result[[length(result) + 1]] <- as.numeric(names(checkz)[checkz])
-            ints  <-  ints[!checkz]
+            area  <-  area[!checkz]
             checkz <- checkz[!checkz]
             
             if (length(checkz) > 0) {
@@ -37,7 +118,7 @@ function(ints, nofsets, ellipse = FALSE) {
         }
     }
     else {
-        result = list(ints)
+        result = list(area)
     }
     
     

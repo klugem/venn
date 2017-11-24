@@ -1,5 +1,5 @@
 `plotRules` <-
-function(rules, zcolor = "bw", ellipse = FALSE, transparency = 0.3, ...) {
+function(rules, zcolor = "bw", ellipse = FALSE, opacity = 0.3, ...) {
     
     # s - sets; v - version; b - borders; x,y - coordinates
     borders <- read.csv(file.path(system.file("data", package="venn"), "borders.csv.gz"))
@@ -80,7 +80,7 @@ function(rules, zcolor = "bw", ellipse = FALSE, transparency = 0.3, ...) {
                 zones[[i]] <- getZones(rowns[[i]], nofsets, ellipse)
                 polygons <- rbind(zeroset, rep(NA, 2), zones[[i]][[1]])
                 polygons <- polygons[-nrow(polygons), ] # needed...?
-                polypath(polygons, rule = "evenodd", col = adjustcolor(zcolor[i], alpha.f = transparency), border = NA)
+                polypath(polygons, rule = "evenodd", col = adjustcolor(zcolor[i], alpha.f = opacity), border = NA)
             }
         }
         
@@ -104,7 +104,7 @@ function(rules, zcolor = "bw", ellipse = FALSE, transparency = 0.3, ...) {
             for (i in seq(length(zones))) {
                 if (!iregular[i]) {
                     for (j in seq(length(zones[[i]]))) {
-                        polygon(zones[[i]][[j]], col = adjustcolor(zcolor[i], alpha.f = transparency), border = NA)
+                        polygon(zones[[i]][[j]], col = adjustcolor(zcolor[i], alpha.f = opacity), border = NA)
                     }
                 }
             }
@@ -149,7 +149,7 @@ function(rules, zcolor = "bw", ellipse = FALSE, transparency = 0.3, ...) {
             # the zones have not been plotted yet
             
             polygon(sets[sets$s == nofsets & sets$v == as.numeric(ellipse), c("x", "y")],
-                    col = adjustcolor(zcolor, alpha.f = transparency), border = NA)
+                    col = adjustcolor(zcolor, alpha.f = opacity), border = NA)
             
         }
         
@@ -253,6 +253,10 @@ function(rules, zcolor = "bw", ellipse = FALSE, transparency = 0.3, ...) {
                 
                         seplines <- list(as.name("lines"), x = zones[[i]][[j]])
                         suppress <- list(as.name("suppressWarnings"))
+                        
+                        if (any(names(other.args) == "col")) {
+                            other.args$col <- unlist(strsplit(gsub("[[:space:]]", "", other.args$col), split = ","))
+                        }
                         
                         for (j in names(other.args)) {
                             seplines[[j]] <- other.args[[j]][i]

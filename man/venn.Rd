@@ -10,20 +10,21 @@ up to 7 sets.
 }
 
 \usage{
-venn(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
-     transparency = 0.3, ellipse = FALSE, size = 15, cexil = 0.45, cexsn = 0.85, ...)
+venn(x, snames = "", ilabels = FALSE, counts = FALSE, ellipse = FALSE,
+     zcolor = "bw", opacity = 0.3, size = 15, cexil = 0.6, cexsn = 0.85, ...)
 }
 
 \arguments{
   \item{x}{A single number (of sets), or a metacommand formula (see details),
            or a list containing set values, or a dataset containing boolean values.}
   \item{snames}{An optional parameter containing the names for each set.}
-  \item{ilabels}{Logical, print the labels for each intersection.}
-  \item{counts}{Logical, print the counts for each intersection.}
+  \item{ilabels}{Logical: print the labels for each intersection.}
+  \item{counts}{Logical: print the counts for each intersection.}
+  \item{ellipse}{Logical, force the shape to an ellipse, where possible}
   \item{zcolor}{A vector of colors for the custom zones, or predefined colors
         if "style"}
-  \item{transparency}{Transparency for the color(s) specified with \code{zcolor}}
-  \item{ellipse}{Logical, force the shape to an ellipse, where possible}
+  \item{opacity}{Degree of opacity for the color(s) specified with
+        \code{zcolor} (less opacity, more transparency).}
   \item{size}{Plot size, in centimeters.}
   \item{cexil}{Character expansion for the intersection labels}
   \item{cexsn}{Character expansion for the set names}
@@ -73,7 +74,8 @@ Argument \bold{\code{counts}} is used when \bold{\code{x}} is a list or a datafr
 it counts the number of common values for each intersection. When \bold{\code{x}} is a
 dataframe (comprised of exclusively boolean values 0 and 1), it counts the number of
 similar rows, for each intersection. \bold{\code{counts}} is activated by default when
-\bold{\code{x}} is a list or a dataframe.
+\bold{\code{x}} is a list or a dataframe. If a particular intersection doesn't have any
+common values (or no rows), the count "0" is left blank and not displayed.
 
 The argument \bold{\code{snames}} establishes names for the different sets, or in its absence
 it is taken from \bold{\code{LETTERS}}. When \bold{\code{x}} is a list or a dataframe,
@@ -101,19 +103,25 @@ are provided via \bold{\code{zcolor}}, it should have a length of 3 colors: the 
 absence of the outcome (\bold{\code{0}}), the second for the presence of the outcome (\bold{\code{1}}),
 and the third for the contradictions (\bold{\code{C}}). Remainders have no color, by default.
 
+The argument \bold{\code{cexil}} works only if the intersection labels (\bold{\code{ilabels}}) or
+intersection \bold{\code{counts}} are activated, and it sets the size of the labels via a
+\bold{\code{cex}} argument. In the absence of a specific value from the user, it's default is
+set to 0.6 for all Venn diagrams with up to five sets, and it automatically decreases to 0.5
+for six sets and 0.45 for seven sets.
+
 Via \bold{\code{...}}, users can specify additional parameters, mainly for the outer borders
 of the sets, as specified by \bold{\code{par}}. All of them are feeded to the function
 \bold{\code{lines()}} which is responsible with the borders.
 
 For up to 3 sets, the shapes can be circular. For more than 3 sets, the shape cannot be
-circular, in the case of 4 and 5 sets they are ellipses. For more than 5 sets the
+circular: for 4 and 5 sets they can be ellipses, while for more than 5 sets the
 shapes cannot be continous (they might be monotone, but not continous). The 7 sets
 diagram is called "Adelaide" (Ruskey, 2005).
 
 The most challenging diagram is the one with 6 sets, where for many years it was
 thought a Venn diagram didn't even exist. All diagrams are symetric, except for the
 one with 6 sets, where some of the sets have different shapes. The diagram in this
-package is an adaptation from Mamakani, K., Myrvold W. and F. Ruskey (2011), 
+package is an adaptation from Mamakani, K., Myrvold W. and F. Ruskey (2011).
 
 
 }
@@ -122,7 +130,7 @@ package is an adaptation from Mamakani, K., Myrvold W. and F. Ruskey (2011),
 \references{
 
 Ruskey, F. and M. Weston. 2005. \emph{Venn diagrams}. Electronic Journal of Combinatorics,
-Dynamic Survey DS vol.5.
+Dynamic Survey DS5.
 
 Mamakani, K., Myrvold W. and F. Ruskey. 2011. \emph{Generating all Simple Convexly-drawable
 Polar Symmetric 6-Venn Diagrams}. International Workshop on Combinatorial Algorithms, Victoria.
@@ -170,10 +178,10 @@ venn(5, ilabels = TRUE, zcolor = "style")
 venn("1---- + ----1")
 
 # with different colors
-venn("1---- + ----1", zcolor = c("red", "blue"))
+venn("1---- + ----1", zcolor = "red, blue")
 
 # same colors for the borders
-venn("1---- + ----1", zcolor = c("red", "blue"), col = c("red", "blue"))
+venn("1---- + ----1", zcolor = "red, blue", col = "red, blue")
 
 # 6 sets diagram
 venn(6)
@@ -197,14 +205,14 @@ x <- as.data.frame(matrix(sample(0:1, 150, replace=TRUE), ncol=5))
 venn(x)
 
 
-# using disjunctive normal form notation
+# using sum of products notation
 venn("A + Bc", snames = "A,B,C,D")
 
 # the union of two sets, example from above
-venn("A + E", snames = "A,B,C,D,E", zcol = c("red", "blue"))
+venn("A + E", snames = "A,B,C,D,E", zcol = "red, blue")
 
 # if the expression is a valid R statment, it works even without quotes
-venn(A + bc + DE, snames = "A,B,C,D,E", zcol = c("red", "palegreen", "blue"))
+venn(A + bc + DE, snames = "A,B,C,D,E", zcol = "red, palegreen, blue")
 
 
 \dontrun{
@@ -213,13 +221,26 @@ venn(A + bc + DE, snames = "A,B,C,D,E", zcol = c("red", "palegreen", "blue"))
 library(QCA)
 
 data(CVF)
-obj <- truthTable(CVF, "PROTEST", incl.cut = 0.8)
+obj <- truthTable(CVF, "PROTEST", incl.cut = 0.85)
 
 venn(obj)
 
 
-# to set transparency based on inclusion scores
-venn(obj, transparency = obj$tt$incl)
+# to set opacity based on inclusion scores
+# (less inclusion, more transparent)
+
+venn(obj, opacity = obj$tt$incl)
+
+
+# custom labels for intersections
+
+pCVF <- minimize(obj, include = "?")
+venn(pCVF$solution[[1]], zcol = "#ffdd77, #bb2020, #1188cc")
+cases <- paste(c("HungariansRom", "CatholicsNIreland", "AlbaniansFYROM",
+                 "RussiansEstonia"), collapse = "\n")
+coords <- unlist(getCentroid(getZones(pCVF$solution[[1]][2])))
+text(coords[1], coords[2], labels = cases, cex = 0.85)
+
 }
 }
 

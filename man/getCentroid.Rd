@@ -45,21 +45,20 @@ https://en.wikipedia.org/wiki/Centroid
 venn("0110")
 
 # centroid for the intersection "0110" in a 4 set diagram
-# "0110" is 0*2^3 + 1*2^2 + 1*2^1 + 0*2^0 = 6
-centroid <- getCentroid(getZones(6, 4))[[1]]
+centroid <- getCentroid(getZones("0110"))[[1]]
 
 text(centroid[1], centroid[2], labels = "0110", cex = 0.85)
 
 
 # centroids for the two zones in the "E not A" zones
-venn("0---1")
-zones <- getZones(seq(1, 15, by = 2), 5)
+venn(5)
+area <- getZones("0---1") # list of length 2
 
-polygon(zones[[1]], col="lightblue")
+polygon(area[[1]], col="lightblue")
 
-polygon(zones[[2]], col="lightblue")
+polygon(area[[2]], col="lightblue")
 
-text(do.call("rbind", getCentroid(zones)),
+text(do.call("rbind", getCentroid(area)),
      labels = c("zone 1", "zone 2"), cex = 0.85)
 
 }

@@ -1,12 +1,13 @@
 `venn` <-
-function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
-         transparency = 0.3, ellipse = FALSE, size = 15, cexil = 0.45, cexsn = 0.85, ...) {
+function(x, snames = "", ilabels = FALSE, counts = FALSE, ellipse = FALSE,
+     zcolor = "bw", opacity = 0.3, size = 15, cexil = 0.6, cexsn = 0.85, ...) {
     
     if (missing(x)) {
         cat("\n")
         stop("Argument \"x\" is missing.\n\n", call. = FALSE)
     }
     
+    # to see what's in the "..." argument
     funargs <- unlist(lapply(match.call(), deparse)[-1])
     
     if (inherits(tryCatch(eval(x), error = function(e) e), "error")) {
@@ -21,6 +22,7 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
     }
     
     if (!identical(zcolor, "bw") & !identical(zcolor, "style")) {
+        zcolor <- unlist(strsplit(gsub("[[:space:]]", "", zcolor), split = ","))
         testcolor <- tryCatch(col2rgb(zcolor), error = function(e) e)
         if (!is.matrix(testcolor)) {
             cat("\n")
@@ -36,7 +38,8 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
     }
     
     ttqca <- FALSE
-    
+    listx <- FALSE
+    cts <- NULL
     
     if (inherits(x, "qca") | inherits(x, "tt")) {
         
@@ -44,14 +47,14 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
         otype <- "input"
         
         if (inherits(x, "tt")) {
-            origin <- x$origin
+            QCA <- all(which(is.element(c("minmat", "DCC", "options", "neg.out", "opts"), names(x))) < 4)
             otype <- "truth table"
             tt <- x$tt
             snames <- unlist(strsplit(gsub("[[:space:]]", "", x$options$conditions), split = ","))
             noflevels <- x$noflevels
         }
         else {
-            origin <- x$tt$origin
+            QCA <- all(which(is.element(c("minmat", "DCC", "options", "neg.out", "opts"), names(x$tt))) < 4)
             otype <- "qca"
             oq <- TRUE
             tt <- x$tt$tt
@@ -60,7 +63,7 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
         }
         
         
-        if (!identical(origin, "QCAGUI")) {
+        if (!QCA) {
             cat("\n")
             stop(paste("Please create a proper", otype, "object with package QCA.\n\n"), call. = FALSE)
         }
@@ -97,7 +100,7 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
             }
         }
         
-        individual <- length(transparency) == nrow(tt)
+        individual <- length(opacity) == nrow(tt)
         
         ints <- read.csv(file.path(system.file("data", package="venn"), "ints.csv.gz"))
         
@@ -109,7 +112,7 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
                 
                 if (tt$OUT[i] != "?") {
                     
-                    color <- adjustcolor(ttcolors[tt$OUT[i]], alpha.f = as.numeric(transparency[i]))
+                    color <- adjustcolor(ttcolors[tt$OUT[i]], alpha.f = as.numeric(opacity[i]))
                     
                     if (i == 1) {
                         
@@ -179,6 +182,13 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
         
     }
     else if (is.character(x)) {
+        
+        if (any(grepl("\\$solution", funargs["x"]))) {
+            obj <- get(unlist(strsplit(funargs["x"], split = "[$]"))[1])
+            snames <- obj$tt$options$conditions
+            x <- paste(x, collapse = " + ")
+        }
+        
         x <- gsub("[[:space:]]", "", x)
         
         if (!all(gsub("0|1|-|\\+", "", x) == "")) {
@@ -237,35 +247,70 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
     }
     else if (is.list(x)) {
         
-        if (length(x) > 7) {
-            x <- x[seq(7)]
+        if (any(grepl("\\$solution", funargs["x"]))) {
+            obj <- get(unlist(strsplit(funargs["x"], split = "[$]"))[1])
+            snames <- obj$tt$options$conditions
+            nofsets <- length(snames)
+            
+            x <- translate2(paste(unlist(x), collapse = " + "), snames)
+            
+            x <- apply(x, 1, function(y) {
+                y[y < 0] <- "-"
+                paste(y, collapse="")
+            })
+            
         }
-        
-        if (!is.null(names(x))) {
-            if (all(names(x) != "")) {
-                snames <- names(x)
+        else {
+            
+            listx <- TRUE
+            
+            if (length(x) > 7) {
+                x <- x[seq(7)]
             }
-        }
-        
-        if (nofsets == 0) {
-            nofsets <- length(x)
-        }
-        
-        cts <- apply(sapply(rev(seq(nofsets)), function(x) {
-            rep.int(c(sapply(0:1, function(y) rep.int(y, 2^(x - 1)))), 2^nofsets/2^x)}), 1,
-            function(y) {
-                return(length(setdiff(Reduce(intersect, x[y == 1]), unlist(x[y == 0]))))
+            
+            if (!is.null(names(x))) {
+                if (all(names(x) != "")) {
+                    snames <- names(x)
+                }
             }
-        )
-        
-        counts <- TRUE
-        x <- nofsets
+            
+            if (identical(snames, "")) {
+                snames <- LETTERS[seq(length(x))]
+            }
+            
+            if (nofsets == 0) {
+                nofsets <- length(x)
+            }
+            
+            tt <- sapply(rev(seq(nofsets)), function(x) {
+                      rep.int(c(sapply(0:1, function(y) rep.int(y, 2^(x - 1)))), 2^nofsets/2^x)})
+            
+            colnames(tt) <- snames
+            
+            intersections <- apply(tt, 1,
+                function(y) {
+                    setdiff(Reduce(intersect, x[y == 1]), unlist(x[y == 0]))
+                }
+            )
+            
+            names(intersections) <- apply(tt, 1, function(x) paste(snames[x == 1], collapse = ":"))
+            
+            cts <- unlist(lapply(intersections, length))
+            
+            intersections <- intersections[cts > 0]
+            
+            tt <- as.data.frame(cbind(tt, counts = cts))
+            
+            attr(tt, "intersections") <- intersections
+            
+            counts <- TRUE
+            x <- nofsets
+        }
     }
     else {
         cat("\n")
         stop("Unrecognised argument \"x\".\n\n", call. = FALSE)
     }
-    
     
     if (nofsets > 7) {
         cat("\n")
@@ -283,12 +328,15 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
     }
     
     
+    if (!is.element("cexil", names(funargs))) {
+        cexil <- cexil - ifelse(nofsets > 5, 0.1, 0) - ifelse(nofsets > 6, 0.05, 0)
+    }
+    
     if (!ttqca) {
         openPlot(size)
     }
     
-    
-    plotRules(x, zcolor, ellipse, transparency, ...=...)
+    plotRules(x, zcolor, ellipse, opacity, ...=...)
     
     scoords <- data.frame(
         s = c(1, rep(2, 2), rep(3, 3), rep(4, 4), rep(5, 10), rep(6, 6), rep(7, 7), rep(4, 4)),
@@ -297,7 +345,7 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
         y = c(780, 780, 780, 560, 910, 560, 663, 850, 850, 663,    800, 960, 700,  50, 120,     750, 963, 688,  40,  88,       860, 975, 775, 165,  30, 140, 955, 980, 780, 200,  15, 120, 690, 670, 850, 850, 670)
     )
     
-    if (ilabels | counts) {
+    if (ilabels | counts & !is.null(cts)) {
         icoords <- read.csv(file.path(system.file("data", package="venn"), "icoords.csv.gz"))
         
         ilabels <- icoords$l[icoords$s == nofsets & icoords$v == as.numeric(ellipse)]
@@ -326,8 +374,9 @@ function(x, snames = c(""), ilabels = FALSE, counts = FALSE, zcolor = c("bw"),
         text(seq(40, 370, length.out = 4), rep(-26, 4), names(ttcolors), cex = 0.85)
     }
     
-        
-    
+    if (listx) {
+        return(invisible(tt))
+    }
 }
 
 

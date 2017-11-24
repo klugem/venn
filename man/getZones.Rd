@@ -10,32 +10,32 @@ zone or a list of zones.
 }
 
 \usage{
-getZones(ints, nofsets, ellipse = FALSE)
+getZones(area, snames, ellipse = FALSE)
 }
 
 \arguments{
-  \item{ints}{A vector of decimal numbers specific to a list of set intersection.}
-  \item{nofsets}{The number of sets.}
+  \item{area}{A chgaracter expression written in sum of products form.}
+  \item{snames}{A string containing the sets' names, separated by commas.}
   \item{ellipse}{Logical, get the zones from the shape of an ellipse, where possible}
 }
 
 \details{
          
+A SOP ("sum of products") is also known as a DNF ("disjunctive normal form"), or in other
+words a "union of intersections", for example \bold{\code{A*D + B*c}}.
+
+The same expression can be written in curly brackets notation:
+\bold{\code{A{1}*D{1} + B{1}*C{0}}}.
+
+
+The expression \bold{\code{B{1}*C{0}}} can also be written in a pseudo-language, as
+"-10-" (assuming there are only four sets).
+
+
 A "zone" is a union of set intersections. There are exactly \bold{\code{2^k}} intersections
 in a Venn diagram, where \bold{\code{k}} is the number of sets. To highlight an entire set,
 we need a union of all possible intersections which form that set.
 
-In a 3 sets diagram, the (overall) first set is composed by four intersections:\cr
-\bold{\code{100}} for what is in the first set but outside sets 2 and outside set 3\cr
-\bold{\code{101}} for the intersection between sets 1 and 3, outside set 2\cr
-\bold{\code{110}} for the intersection between sets 1 and 2, outside set 3\cr
-\bold{\code{111}} for the intersection between all three sets.
-
-The decimal representation for these intersections is calculated as:\cr
-\bold{\code{100 = 2^2 = 4}}\cr
-\bold{\code{101 = 2^2 + 2^0 = 5}}\cr
-\bold{\code{110 = 2^2 + 2^1 = 6}}\cr
-\bold{\code{111 = 2^2 + 2^1 + 2^0 = 7}}\cr
 
 The argument \bold{\code{ellipse}} retrieves the data from the shape of an ellipse, and it only
 works with 4 and 5 sets.
@@ -49,20 +49,25 @@ A list of self-enclosed polygons, for each independent zone.
 
 \examples{
 
-venn("1--")
+venn(3)
 
-zone <- getZones(4:7, 3)
+area <- getZones("A", snames = "A, B, C")
 # a list of length 1
 
-polygon(zone[[1]], col="lightblue")
+polygon(area[[1]], col="lightblue")
+
+
+# The very same result is obtained with:
+zone <- getZones("1--")
+
 
 
 # for 5 sets, the content of the 5th set but not in the first set is a
 # list of two zones
 
-venn("0---1")
+venn(5)
 
-zones <- getZones(seq(1, 15, by = 2), 5)
+zones <- getZones("0---1")
 # this time a list of length 2
 
 # (re)coloring the first zone (union)
