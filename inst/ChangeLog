@@ -1,3 +1,11 @@
+Version 1.6
+    o Major change in the treatment of custom intersections, the package
+      now supports set unions (using the plus sign), as well as set interesections.
+      Multiple intersections are now separated with a comma.
+    o New argument "borders" to function venn(), defaulted to TRUE in order to
+      preserve backwards compatibility. When deactivated, only the custom
+      intersections will be plotted.
+
 Version 1.5
     o Adaptation to package QCA version 3.0
     o Replaced the argument "nofsets" with "snames", in function getZones()

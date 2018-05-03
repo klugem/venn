@@ -11,7 +11,8 @@ up to 7 sets.
 
 \usage{
 venn(x, snames = "", ilabels = FALSE, counts = FALSE, ellipse = FALSE,
-     zcolor = "bw", opacity = 0.3, size = 15, cexil = 0.6, cexsn = 0.85, ...)
+     zcolor = "bw", opacity = 0.3, size = 15, cexil = 0.6, cexsn = 0.85,
+     borders = TRUE, ...)
 }
 
 \arguments{
@@ -28,6 +29,7 @@ venn(x, snames = "", ilabels = FALSE, counts = FALSE, ellipse = FALSE,
   \item{size}{Plot size, in centimeters.}
   \item{cexil}{Character expansion for the intersection labels}
   \item{cexsn}{Character expansion for the set names}
+  \item{borders}{Logical: draw all intersection borders}
   \item{...}{Additional parameters, mainly for the outer borders of the sets}
 }
 
@@ -123,7 +125,8 @@ thought a Venn diagram didn't even exist. All diagrams are symetric, except for 
 one with 6 sets, where some of the sets have different shapes. The diagram in this
 package is an adaptation from Mamakani, K., Myrvold W. and F. Ruskey (2011).
 
-
+The argument \bold{\code{border}} can be used only for custom intersections and/or unions,
+it has no effect when \bold{\code{x}} is a list, or a data frame, or a truth table object.
 }
 
 
@@ -147,11 +150,8 @@ venn(3)
 # display the first whole set
 venn("1--")
 
-# an equivalent command
-venn("100 + 110 + 101 + 111")
-
-# another equivalent command
-venn(c("100", "110", "101", "111"))
+# an equivalent command, from all intersections
+venn("100, 110, 101, 111")
 
 # adding the labels for the intersections
 venn("1--", ilabels = TRUE)
@@ -178,10 +178,10 @@ venn(5, ilabels = TRUE, zcolor = "style")
 venn("1---- + ----1")
 
 # with different colors
-venn("1---- + ----1", zcolor = "red, blue")
+venn("1---- , ----1", zcolor = "red, blue")
 
 # same colors for the borders
-venn("1---- + ----1", zcolor = "red, blue", col = "red, blue")
+venn("1---- , ----1", zcolor = "red, blue", col = "red, blue")
 
 # 6 sets diagram
 venn(6)
@@ -193,6 +193,11 @@ venn(7)
 # artistic version
 venn(c("1000000", "0100000", "0010000", "0001000",
        "0000100", "0000010", "0000001", "1111111"))
+
+# without all borders
+venn(c("1000000", "0100000", "0010000", "0001000",
+       "0000100", "0000010", "0000001", "1111111"),
+     borders = FALSE)
 
 # when x is a list
 set.seed(12345)
@@ -211,11 +216,8 @@ venn("A + Bc", snames = "A,B,C,D")
 # the union of two sets, example from above
 venn("A + E", snames = "A,B,C,D,E", zcol = "red, blue")
 
-# if the expression is a valid R statment, it works even without quotes
-venn(A + bc + DE, snames = "A,B,C,D,E", zcol = "red, palegreen, blue")
 
 
-\dontrun{
 # produce Venn diagrams for QCA objects
 
 library(QCA)
@@ -241,7 +243,6 @@ cases <- paste(c("HungariansRom", "CatholicsNIreland", "AlbaniansFYROM",
 coords <- unlist(getCentroid(getZones(pCVF$solution[[1]][2])))
 text(coords[1], coords[2], labels = cases, cex = 0.85)
 
-}
 }
 
 
