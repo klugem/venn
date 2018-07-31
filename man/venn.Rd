@@ -10,7 +10,7 @@ up to 7 sets.
 }
 
 \usage{
-venn(x, snames = "", ilabels = FALSE, counts = FALSE, ellipse = FALSE,
+venn(x, snames = "", counts = NULL, ilabels = FALSE, ellipse = FALSE,
      zcolor = "bw", opacity = 0.3, size = 15, cexil = 0.6, cexsn = 0.85,
      borders = TRUE, ...)
 }
@@ -20,7 +20,7 @@ venn(x, snames = "", ilabels = FALSE, counts = FALSE, ellipse = FALSE,
            or a list containing set values, or a dataset containing boolean values.}
   \item{snames}{An optional parameter containing the names for each set.}
   \item{ilabels}{Logical: print the labels for each intersection.}
-  \item{counts}{Logical: print the counts for each intersection.}
+  \item{counts}{A numerical vector of counts for each set intersection.}
   \item{ellipse}{Logical, force the shape to an ellipse, where possible}
   \item{zcolor}{A vector of colors for the custom zones, or predefined colors
         if "style"}
@@ -36,7 +36,7 @@ venn(x, snames = "", ilabels = FALSE, counts = FALSE, ellipse = FALSE,
 \details{
     
 The argument \bold{\code{x}} can be either:\cr
-- a single number of sets, between 1 and 7\cr
+- a single number (of sets), between 1 and 7\cr
 - a metacommand (character) to draw custom intersection zones\cr
 - a list, containing values for the different sets: each component is a set,
   and only up to 7 components are processed.\cr
@@ -72,17 +72,18 @@ It is also possible to use a regular, disjunctive normal form, like \bold{\code{
 which is equivalent with \bold{\code{"Abc + AbC + ABc + ABC"}}. When \bold{\code{x}}
 is an expression written in DNF, if a valid R statement then quoting is not even necessary.
 
-Argument \bold{\code{counts}} is used when \bold{\code{x}} is a list or a dataframe. When a list,
-it counts the number of common values for each intersection. When \bold{\code{x}} is a
-dataframe (comprised of exclusively boolean values 0 and 1), it counts the number of
-similar rows, for each intersection. \bold{\code{counts}} is activated by default when
-\bold{\code{x}} is a list or a dataframe. If a particular intersection doesn't have any
-common values (or no rows), the count "0" is left blank and not displayed.
-
 The argument \bold{\code{snames}} establishes names for the different sets, or in its absence
 it is taken from \bold{\code{LETTERS}}. When \bold{\code{x}} is a list or a dataframe,
 \bold{\code{snames}} is taken from their names. The length of the \bold{\code{snames}}
 indicates the total number of sets.
+
+A numerical vector can be supplied with the argument \bold{\code{counts}}, when the argument
+\bold{\code{x}} is a single number of sets. The counts should match the increasing order of
+the binary representation for the set intersections. When the argument \bold{\code{x}} is a
+list, the counts are taken from the number of common values for each intersection, and when
+\bold{\code{x}} is a data frame, (comprised of exclusively boolean values 0 and 1) the counts
+are taken from the number of similar rows. If a particular intersection does not have any
+common values (or no rows), the count "0" is left blank and not displayed in the diagram.
 
 The argument \bold{\code{ellipse}} differentiates between two types of diagrams for 4 and 5 sets.
 The idea is to allow for as much space as possible for each intersection (also as equal
@@ -147,6 +148,9 @@ LNCS, 7056, 275-286.
 # A simple Venn diagram with 3 sets
 venn(3)
 
+# with a vector of counts: 1 for "000", 2 for "001" etc.
+venn(3, counts = 1:8)
+
 # display the first whole set
 venn("1--")
 
@@ -198,6 +202,7 @@ venn(c("1000000", "0100000", "0010000", "0001000",
 venn(c("1000000", "0100000", "0010000", "0001000",
        "0000100", "0000010", "0000001", "1111111"),
      borders = FALSE)
+
 
 # when x is a list
 set.seed(12345)

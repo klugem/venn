@@ -1,4 +1,4 @@
-dd275e294e545b61d01dc5618b57b1bb *DESCRIPTION
+87a5dbc0ebe71c97ce76ac3becf3e67a *DESCRIPTION
 cd56e7078bfb836e30705c349745e10f *NAMESPACE
 ff2f1300c06be2ef4aa6d552a31d8d2e *R/checkZone.R
 8e09a89c01e0981002a81ac65a6df918 *R/extractDisjunctions.R
@@ -7,13 +7,13 @@ dfacf0113e0581d7cb590a5a691cbbc8 *R/getCentroid.R
 0a4d059d959b05bb401d09541e13fc06 *R/openPlot.R
 9f3a1a59cc16e59c4023ad6b9636c567 *R/plotRules.R
 eeab5b379d23b5fab8d20cd4a3e2bf12 *R/translate2.R
-0e691ea81afa876068040926fcc2a07c *R/venn.R
+004ed78ae5f8223aa285a54ee75d8c5b *R/venn.R
 3ff177d0f4449873e299e8fcb609f270 *data/borders.csv.gz
 1c5a800413b76666f056f3362e52a097 *data/ib.csv.gz
 81ce30d1849319a5d20009c2c7ff907c *data/icoords.csv.gz
 58f3c11bd4a38c8dc884f65d9af39281 *data/ints.csv.gz
 43f6d064e8353378410a8484851f5707 *data/sets.csv.gz
-0e39d19a676fb0f7b209927e9da4344f *inst/ChangeLog
+b0ccc42cb0f83cadb2bd15483c77715a *inst/ChangeLog
 702e8485242b3ae5b4ce75a5ede13acb *inst/web/css/bootstrap-responsive.css
 9fd80f893c6b31dbcad6fc61fe2ea5b8 *inst/web/css/bootstrap-responsive.min.css
 6fa2911ee460068a855177a8dda42a6e *inst/web/css/bootstrap.css
@@ -58,5 +58,5 @@ ef3d64d53b27734eb5a707b0f84cb89b *inst/web/venn.package.html
 6c8be33f271ae22c436ea61aade325fa *man/getCentroid.Rd
 f92ccdbdaecc537520fb0e58e492afa8 *man/getZones.Rd
 dbcf080790957680596a6490a4169bd6 *man/venn-internal.Rd
-a14985dfa17f1580a6b621b3320f8cd2 *man/venn.Rd
-2000f1aa2d56ed3bb43fcc7253f2bd06 *man/venn.package.Rd
+c08d76c186eec4e76fd709ea77b41850 *man/venn.Rd
+3589d30893d75046f3fb07c04b85ff6d *man/venn.package.Rd

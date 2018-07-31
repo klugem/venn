@@ -24,7 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 `venn` <-
-function(x, snames = "", ilabels = FALSE, counts = FALSE, ellipse = FALSE,
+function(x, snames = "", counts = NULL, ilabels = FALSE, ellipse = FALSE,
      zcolor = "bw", opacity = 0.3, size = 15, cexil = 0.6, cexsn = 0.85,
      borders = TRUE, ...) {
     if (missing(x)) {
@@ -60,6 +60,18 @@ function(x, snames = "", ilabels = FALSE, counts = FALSE, ellipse = FALSE,
     ttqca <- FALSE
     listx <- FALSE
     cts <- NULL
+    if (is.numeric(counts) & is.numeric(x)) {
+        if (length(counts) == 2^x) {
+            cts <- counts
+            counts <- TRUE
+        }
+        else {
+            counts <- FALSE
+        }
+    }
+    else {
+        counts <- FALSE
+    }
     if (inherits(x, "qca") | inherits(x, "tt")) {
         ttqca <- TRUE
         otype <- "input"
@@ -215,10 +227,10 @@ function(x, snames = "", ilabels = FALSE, counts = FALSE, ellipse = FALSE,
             snames <- obj$tt$options$conditions
             nofsets <- length(snames)
             x <- translate2(paste(unlist(x), collapse = " + "), snames)
-            x <- apply(x, 1, function(y) {
+            x <- as.list(apply(x, 1, function(y) {
                 y[y < 0] <- "-"
                 paste(y, collapse = "")
-            })
+            }))
         }
         else {
             listx <- TRUE
