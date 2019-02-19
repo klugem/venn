@@ -74,7 +74,7 @@ function(rules, zcolor = "bw", ellipse = FALSE, opacity = 0.3, allborders = TRUE
         if (any(iregular)) { 
             for (i in which(iregular)) {
                 zones[[i]] <- getZones(rowns[[i]], nofsets, ellipse)
-                polygons <- rbind(zeroset, rep(NA, 2), zones[[i]][[1]])
+              #  polygons <- rbind(zeroset, rep(NA, 2), zones[[i]][[1]])
                 polygons <- polygons[-nrow(polygons), ] 
                 polypath(polygons, rule = "evenodd", col = adjustcolor(zcolor[i], alpha.f = opacity), border = NA)
             }
@@ -118,7 +118,7 @@ function(rules, zcolor = "bw", ellipse = FALSE, opacity = 0.3, allborders = TRUE
         ellipse <- FALSE
     }
     other.args <- list(...)
-    lines(zeroset)
+   # lines(zeroset)
     if (!identical(zcolor, "bw")) {
         bcolor <- rgb(t(col2rgb(zcolor)/1.4), maxColorValue = 255)
     }
